@@ -19,27 +19,40 @@ public class Client {
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        String player2Name = in.readLine();
-        System.out.println(player2Name);
+        String serverMessage = in.readLine();
+        System.out.println(serverMessage);
+
+        String player2 = clientInput.readLine();
+        out.println(player2);
 
         int round = 1;
 
-        //String serverPrompt;
-        //serverPrompt = in.readLine();
-        //out.println(serverPrompt);
 
 
-        while (round <= 4) { // I have no idea why this should be 4
+
+        while (round <= 3) {
+
+            String guessPrompt;
+            guessPrompt = in.readLine();
+            System.out.println(guessPrompt);
+
+            String serverPrompt;
+            serverPrompt = in.readLine();
+            System.out.println(serverPrompt);
 
             String userGuess = clientInput.readLine();
             out.println(userGuess); // Send the guess to the server
+
+            String winnerPrompt; // announce round winner
+            winnerPrompt = in.readLine();
+            System.out.println(winnerPrompt);
             round++;
         }
-        // exclude name from loop
-        // add in readline seperately
 
-
-
+        String finalWinnerPrompt; // announce winner
+        finalWinnerPrompt = in.readLine();
+        System.out.println(finalWinnerPrompt);
+        round++;
 
     }
 }

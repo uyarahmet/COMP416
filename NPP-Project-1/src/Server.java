@@ -34,6 +34,8 @@ public class Server {
         player2 = in.readLine();
 
         System.out.println("You are playing with " + player2);
+
+
         int times = 3;
         int player1_score = 0;
         int player2_score = 0;
@@ -44,12 +46,18 @@ public class Server {
         while(times > 0){
 
             System.out.println(player1 + ", please enter your x and y guesses, comma separated:");
+
+            // add waiting for player 1 guess
+            out.println("Waiting for player 1 guess");
+
+
             String[] player1Guess = serverInput.readLine().split(", ");
             int player1X = Integer.parseInt(player1Guess[0]);
             int player1Y = Integer.parseInt(player1Guess[1]);
 
             System.out.println("Waiting for player 2 guess. . .");
             out.println(player2 + ", please enter your x and y guesses, comma separated:");
+
 
 
             String player2Guess = in.readLine();
@@ -70,12 +78,14 @@ public class Server {
             }
 
             System.out.println("Winner for round " + (4-times) + " is " + winner);
+            out.println("Winner for round " + (4-times) + " is " + winner);
 
             times--;
         }
 
         String winner = (player1_score > player2_score) ? player1 : player2;
         System.out.println("Game Winner is " + winner);
+        out.println("Game Winner is " + winner);
 
         out.close();
         in.close();

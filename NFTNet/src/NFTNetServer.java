@@ -43,46 +43,39 @@ class ClientHandler implements Runnable {
                     String nftListData = fetchNFTListData();
 
                     if (nftListData != null) {
-                        // Respond with the fetched NFT list data
-                        String responseMessage = "RES|SUCCESS|" + nftListData;
+                        String responseMessage = "RES|SUCCESS|" + nftListData; // Responding with fetched NFT list data
                         out.println(responseMessage);
                     } else {
-                        // Handle the case where data retrieval from CoinGecko API failed
-                        String errorMessage = "Failed to retrieve NFT list data";
+                        String errorMessage = "Failed to retrieve NFT list data"; // Handling the case where data retrieval from CoinGecko API failed
                         String responseMessage = "RES|ERROR|" + errorMessage;
                         out.println(responseMessage);
 
                     }
 
                 } else if (requestType.equals("SEARCH")) {
-                        // Implement logic to query CoinGecko API for a specific NFT by ID
-                        // Simulate a response for demonstration purposes
+                        // Implementing logic to query CoinGecko API for a specific NFT by ID
                     if (parts.length >= 3) {
-                        // Extract the NFT ID from the request
-                        String nftId = parts[2];
 
-                        // Fetch NFT data for the specified ID from the CoinGecko API
+                        String nftId = parts[2];
                         String nftData = fetchNFTIdData(nftId);
 
                         if (nftData != null) {
-                            // Respond with the fetched NFT data
                             String responseMessage = "RES|SUCCESS|" + nftData;
                             out.println(responseMessage);
                         } else {
-                            // Handle the case where data retrieval from CoinGecko API failed
                             String errorMessage = "Failed to retrieve NFT data for the specified ID";
                             String responseMessage = "RES|ERROR|" + errorMessage;
                             out.println(responseMessage);
                         }
                     } else {
-                        // Handle missing NFT ID in the request
+                        // Handling missing NFT ID in the request
                         String errorMessage = "NFT ID is missing in the request";
                         String responseMessage = "RES|ERROR|" + errorMessage;
                         out.println(responseMessage);
                     }
 
                 } else {
-                        // Handle unsupported request types
+                        // Handling unsupported request types
                         String errorMessage = "Unsupported request type";
                         String responseMessage = "RES|ERROR|" + errorMessage;
                         out.println(responseMessage);

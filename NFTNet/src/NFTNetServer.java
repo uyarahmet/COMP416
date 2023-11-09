@@ -54,8 +54,7 @@ class ClientHandler implements Runnable {
                     String requestType = parts[1];
 
                     if (requestType.equals("LIST")) {
-                        // Implement logic to query CoinGecko API for NFT list
-                        // Simulate a response for demonstration purposes
+
 
                         String nftListData = fetchNFTListData();
 
@@ -68,7 +67,6 @@ class ClientHandler implements Runnable {
                             out.println(responseMessage);
                         }
                     } else if (requestType.equals("SEARCH")) {
-                        // Implementing logic to query CoinGecko API for a specific NFT by ID
                         if (parts.length >= 3) {
                             String nftId = parts[2];
                             String nftData = fetchNFTIdData(nftId);
@@ -82,19 +80,16 @@ class ClientHandler implements Runnable {
                                 out.println(responseMessage);
                             }
                         } else {
-                            // Handling missing NFT ID in the request
                             String errorMessage = "NFT ID is missing in the request";
                             String responseMessage = "RES|ERROR|" + errorMessage;
                             out.println(responseMessage);
                         }
                     } else {
-                        // Handling unsupported request types
                         String errorMessage = "Unsupported request type";
                         String responseMessage = "RES|ERROR|" + errorMessage;
                         out.println(responseMessage);
                     }
                 } else {
-                    // Handle invalid request format
                     String errorMessage = "Invalid request format";
                     String responseMessage = "RES|ERROR|" + errorMessage;
                     out.println(responseMessage);

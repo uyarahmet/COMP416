@@ -3,50 +3,57 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class NFTNetClient {
-    public static void main(String[] args) throws IOException {
-        Socket socket = new Socket("localhost", 8000);
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        Scanner scanner = new Scanner(System.in);
+    public static void main(String[] args) {
+        try (Socket socket = new Socket("localhost", 8000);
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             Scanner scanner = new Scanner(System.in)) {
 
-        System.out.println("Server socket: " + socket.getInetAddress() + ":" + socket.getPort()); // 1. display information
+            System.out.println("Server socket: " + socket.getInetAddress() + ":" + socket.getPort());
 
-        // TODO: Write the humane prompt, make the user select from list.
+            boolean flag = true;
 
-        boolean flag = true;
+            while (flag) {
+                // Display menu and get user input
+                System.out.println("Choose a request type:");
+                System.out.println("1. List NFTs (Enter 'list')");
+                System.out.println("2. Get NFT Details (Enter 'details')");
+                System.out.println("3. Exit (Enter 'exit')");
+                String requestType = scanner.nextLine();
 
-        while (true) {
+                if ("list".equalsIgnoreCase(requestType)) {
+                    // Send a "LIST" request to the server
+                    String listRequest = "REQ|LIST";
+                    out.println(listRequest);
 
-            // Receiving and processing the server's response
-            System.out.println("Choose a request type:");
-            System.out.println("1. List NFTs (Enter 'list')");
-            System.out.println("2. Get NFT Details (Enter 'details')");
-            System.out.println("3. Exit Program (Enter 'exit')");
-            String requestType = scanner.nextLine();
+                    // Receive and process the server's response
+                    processServerResponse(in.readLine());
+                } else if ("details".equalsIgnoreCase(requestType)) {
+                    // Prompt the user to enter an NFT ID for details
+                    System.out.print("Enter the NFT ID: ");
+                    String nftId = scanner.nextLine();
 
-            if(requestType.equalsIgnoreCase("exit")){ // exit program if specified.
-                break;
+                    // Send a "SEARCH" request to the server with the NFT ID
+                    String searchRequest = "REQ|SEARCH|" + nftId;
+                    out.println(searchRequest);
+
+                    // Receive and process the server's response
+                    processServerResponse(in.readLine());
+                } else if ("exit".equalsIgnoreCase(requestType)) {
+                    // Exit the loop if the user enters 'exit'
+                    flag = false;
+                } else {
+                    System.out.println("Invalid request type. Please enter 'list', 'details', or 'exit'.");
+                }
             }
 
-            if (requestType.equalsIgnoreCase("list")) {
-                // Send a "LIST" request to the server
-                String listRequest = "REQ|LIST";
-                out.println(listRequest);
-            } else if (requestType.equalsIgnoreCase("details")) {
-                // Prompt the user to enter an NFT ID for details
-                System.out.print("Enter the NFT ID: ");
-                String nftId = scanner.nextLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-                // Send a "SEARCH" request to the server with the NFT ID
-                String searchRequest = "REQ|SEARCH|" + nftId;
-                out.println(searchRequest);
-            } else {
-                System.out.println("Invalid request type. Please enter 'list' or 'details'.");
-            }
-
-
-            // Receiving and processing the server's response
-            String serverResponse = in.readLine();
+    private static void processServerResponse(String serverResponse) {
+        if (serverResponse != null) {
             String[] responseParts = serverResponse.split("\\|");
             String responseType = responseParts[0];
             String responseStatus = responseParts[1];
@@ -54,13 +61,28 @@ public class NFTNetClient {
             if (responseType.equals("RES") && responseStatus.equals("SUCCESS")) {
                 // The response is successful; parse the JSON data
                 String responseData = responseParts[2];
-                System.out.println("Received data: " + responseData);
+                //System.out.println("Received data: " + responseData);
+                parseAndPrintData(responseData);
             } else if (responseType.equals("RES") && responseStatus.equals("ERROR")) {
                 // The server responded with an error message
                 String errorMessage = responseParts[2];
                 System.out.println("Server error: " + errorMessage);
             }
-            // Implement the client-side code to send requests and receive responses
+        } else {
+            System.out.println("No response from the server. Exiting...");
+        }
+    }
+
+    private static void parseAndPrintData(String responseData) {
+
+        System.out.println("Parsed NFT Information:");
+
+        String[] keyValuePairs = responseData.split(",");
+        for (String pair : keyValuePairs) {
+            String[] entry = pair.split(":");
+            String key = entry[0].trim().replace("\"", "");
+            String value = entry[1].trim().replace("\"", "");
+            System.out.println(key + ": " + value);
         }
     }
 }

@@ -26,55 +26,57 @@ class ClientHandler implements Runnable {
     public void run() {
         try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
-            // TODO: Implement communication protocol. Handle client requests, query CoinGecko API, and send responses
-            // TODO: Read data from the client
-            String clientMessage = in.readLine();
-            System.out.println("from client: " + clientMessage);
-            String[] parts = clientMessage.split("\\|");
 
+            while (true) {
+                // TODO: Implement communication protocol. Handle client requests, query CoinGecko API, and send responses
+                // TODO: Read data from the client
+                String clientMessage = in.readLine();
 
-            if (parts.length >= 2 && parts[0].equals("REQ")) {
-                String requestType = parts[1];
+                if (clientMessage == null) {
+                    break;  // Connection closed by the client
+                }
 
-                if (requestType.equals("LIST")) {
-                    // Implement logic to query CoinGecko API for NFT list
-                    // Simulate a response for demonstration purposes
+                System.out.println("from client: " + clientMessage);
+                String[] parts = clientMessage.split("\\|");
 
-                    String nftListData = fetchNFTListData();
+                if (parts.length >= 2 && parts[0].equals("REQ")) {
+                    String requestType = parts[1];
 
-                    if (nftListData != null) {
-                        String responseMessage = "RES|SUCCESS|" + nftListData; // Responding with fetched NFT list data
-                        out.println(responseMessage);
-                    } else {
-                        String errorMessage = "Failed to retrieve NFT list data"; // Handling the case where data retrieval from CoinGecko API failed
-                        String responseMessage = "RES|ERROR|" + errorMessage;
-                        out.println(responseMessage);
+                    if (requestType.equals("LIST")) {
+                        // Implement logic to query CoinGecko API for NFT list
+                        // Simulate a response for demonstration purposes
 
-                    }
+                        String nftListData = fetchNFTListData();
 
-                } else if (requestType.equals("SEARCH")) {
-                        // Implementing logic to query CoinGecko API for a specific NFT by ID
-                    if (parts.length >= 3) {
-
-                        String nftId = parts[2];
-                        String nftData = fetchNFTIdData(nftId);
-
-                        if (nftData != null) {
-                            String responseMessage = "RES|SUCCESS|" + nftData;
+                        if (nftListData != null) {
+                            String responseMessage = "RES|SUCCESS|" + nftListData; // Responding with fetched NFT list data
                             out.println(responseMessage);
                         } else {
-                            String errorMessage = "Failed to retrieve NFT data for the specified ID";
+                            String errorMessage = "Failed to retrieve NFT list data"; // Handling the case where data retrieval from CoinGecko API failed
+                            String responseMessage = "RES|ERROR|" + errorMessage;
+                            out.println(responseMessage);
+                        }
+                    } else if (requestType.equals("SEARCH")) {
+                        // Implementing logic to query CoinGecko API for a specific NFT by ID
+                        if (parts.length >= 3) {
+                            String nftId = parts[2];
+                            String nftData = fetchNFTIdData(nftId);
+
+                            if (nftData != null) {
+                                String responseMessage = "RES|SUCCESS|" + nftData;
+                                out.println(responseMessage);
+                            } else {
+                                String errorMessage = "Failed to retrieve NFT data for the specified ID";
+                                String responseMessage = "RES|ERROR|" + errorMessage;
+                                out.println(responseMessage);
+                            }
+                        } else {
+                            // Handling missing NFT ID in the request
+                            String errorMessage = "NFT ID is missing in the request";
                             String responseMessage = "RES|ERROR|" + errorMessage;
                             out.println(responseMessage);
                         }
                     } else {
-                        // Handling missing NFT ID in the request
-                        String errorMessage = "NFT ID is missing in the request";
-                        String responseMessage = "RES|ERROR|" + errorMessage;
-                        out.println(responseMessage);
-                    }
-
-                } else {
                         // Handling unsupported request types
                         String errorMessage = "Unsupported request type";
                         String responseMessage = "RES|ERROR|" + errorMessage;
@@ -86,13 +88,17 @@ class ClientHandler implements Runnable {
                     String responseMessage = "RES|ERROR|" + errorMessage;
                     out.println(responseMessage);
                 }
-
-
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
                 clientSocket.close(); // Close the client socket
-            } catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
 
 
     private String fetchNFTListData() {

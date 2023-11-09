@@ -1,5 +1,8 @@
+import netscape.javascript.JSObject;
+
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
 import java.util.Scanner;
 
 public class NFTNetClient {
@@ -74,15 +77,30 @@ public class NFTNetClient {
     }
 
     private static void parseAndPrintData(String responseData) {
-
         System.out.println("Parsed NFT Information:");
+
+        //System.out.println(responseData);
 
         String[] keyValuePairs = responseData.split(",");
         for (String pair : keyValuePairs) {
             String[] entry = pair.split(":");
-            String key = entry[0].trim().replace("\"", "");
-            String value = entry[1].trim().replace("\"", "");
-            System.out.println(key + ": " + value);
+            if (entry.length >= 2) {
+                String key = entry[0].trim().replace("\"", "");
+                if(key.equalsIgnoreCase("asset_platform_id") ||
+                key.equalsIgnoreCase("id") || key.equalsIgnoreCase("name")) {
+                    String value = entry[1].trim().replace("\"", "");
+                    System.out.println(key + ": " + value);
+                }else{
+                    //System.out.println(pair);
+                }
+            }
+
         }
     }
+
+
+
+
+
+
 }

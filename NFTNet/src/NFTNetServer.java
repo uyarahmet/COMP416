@@ -27,10 +27,21 @@ class ClientHandler implements Runnable {
         try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
+            clientSocket.setSoTimeout(10000); // set time out if client doesn't respond in 10 seconds
+
             while (true) {
                 // TODO: Implement communication protocol. Handle client requests, query CoinGecko API, and send responses
                 // TODO: Read data from the client
-                String clientMessage = in.readLine();
+
+                String clientMessage;
+
+                try {
+                    clientMessage = in.readLine();
+                } catch (SocketTimeoutException e) {
+                    // Client did not send a request in 10 seconds
+                    System.out.println("Client did not send a request within the timeout. Closing the connection.");
+                    break;
+                }
 
                 if (clientMessage == null) {
                     break;  // Connection closed by the client

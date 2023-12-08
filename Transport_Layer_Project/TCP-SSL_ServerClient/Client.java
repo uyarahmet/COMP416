@@ -22,52 +22,55 @@ public class Client {
             System.out.println("Choose a service: 1 for SSL, 2 for TCP");
             int choice = Integer.parseInt(consoleInput.readLine());
 
-            long startTime = System.currentTimeMillis();
+            //for(int i=1; i<=5; i++) {
+            //    long startTime = System.currentTimeMillis();
 
-            if (choice == 1) {
-                // SSL
-                try {
-                    // Load the client's truststore
-                    System.setProperty("javax.net.ssl.trustStore", TRUST_STORE_NAME);
-                    System.setProperty("javax.net.ssl.trustStorePassword", TRUST_STORE_PASSWORD);
+                if (choice == 1) {
+                    // SSL
+                    try {
+                        // Load the client's truststore
+                        System.setProperty("javax.net.ssl.trustStore", TRUST_STORE_NAME);
+                        System.setProperty("javax.net.ssl.trustStorePassword", TRUST_STORE_PASSWORD);
 
-                    // Load the server's certificate into the truststore
-                    KeyStore truststore = KeyStore.getInstance("JKS");
-                    try (InputStream in = new FileInputStream("server_crt.crt")) {
-                        truststore.load(null, TRUST_STORE_PASSWORD.toCharArray());
-                        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-                        X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(in);
-                        truststore.setCertificateEntry("server-certificate", certificate);
+                        // Load the server's certificate into the truststore
+                        KeyStore truststore = KeyStore.getInstance("JKS");
+                        try (InputStream in = new FileInputStream("server_crt.crt")) {
+                            truststore.load(null, TRUST_STORE_PASSWORD.toCharArray());
+                            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+                            X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(in);
+                            truststore.setCertificateEntry("server-certificate", certificate);
+                        }
+
+                        // Create an SSL context with the custom truststore
+                        SSLContext sslContext = SSLContext.getInstance("TLS");
+                        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                        trustManagerFactory.init(truststore);
+                        sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
+
+                        // Set the custom SSL context
+                        SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+
+                        SSLSocket sslSocket = (SSLSocket) sslSocketFactory.createSocket(SERVER_ADDRESS, SSL_PORT);
+                        sslSocket.startHandshake();
+                        performSSLEcho(sslSocket);
+                    } catch (IOException | NoSuchAlgorithmException | KeyStoreException | CertificateException |
+                             KeyManagementException e) {
+                        throw new RuntimeException(e);
                     }
-
-                    // Create an SSL context with the custom truststore
-                    SSLContext sslContext = SSLContext.getInstance("TLS");
-                    TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                    trustManagerFactory.init(truststore);
-                    sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
-
-                    // Set the custom SSL context
-                    SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
-
-                    SSLSocket sslSocket = (SSLSocket) sslSocketFactory.createSocket(SERVER_ADDRESS, SSL_PORT);
-                    sslSocket.startHandshake();
-                    performSSLEcho(sslSocket);
-                } catch (IOException | NoSuchAlgorithmException | KeyStoreException | CertificateException | KeyManagementException e) {
-                    throw new RuntimeException(e);
+                } else if (choice == 2) {
+                    // TCP
+                    try (Socket tcpSocket = new Socket(SERVER_ADDRESS, TCP_PORT)) {
+                        performEcho(tcpSocket);
+                    }
+                } else {
+                    System.out.println("Invalid choice. Please choose 1 for SSL or 2 for TCP.");
                 }
-            } else if (choice == 2) {
-                // TCP
-                try (Socket tcpSocket = new Socket(SERVER_ADDRESS, TCP_PORT)) {
-                    performEcho(tcpSocket);
-                }
-            } else {
-                System.out.println("Invalid choice. Please choose 1 for SSL or 2 for TCP.");
-            }
 
-            long endTime = System.currentTimeMillis();
-            long delay = endTime - startTime;
+               // long endTime = System.currentTimeMillis();
+               // long delay = endTime - startTime;
+                //System.out.println("Execution " + i + " Delay: " + delay + " ms");
 
-            //System.out.println("Execution " + i + " Delay: " + delay + " ms");
+            //}
 
         } catch (IOException e) {
             e.printStackTrace();

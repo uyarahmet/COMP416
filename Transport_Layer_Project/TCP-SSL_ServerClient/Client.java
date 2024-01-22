@@ -51,7 +51,7 @@ public class Client {
                         SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
                         SSLSocket sslSocket = (SSLSocket) sslSocketFactory.createSocket(SERVER_ADDRESS, SSL_PORT);
-                        sslSocket.startHandshake();
+                        sslSocket.startHandshake(); // start the handshake
                         performSSLEcho(sslSocket);
                     } catch (IOException | NoSuchAlgorithmException | KeyStoreException | CertificateException |
                              KeyManagementException e) {

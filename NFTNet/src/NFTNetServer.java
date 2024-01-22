@@ -27,7 +27,7 @@ class ClientHandler implements Runnable {
         try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
 
-            clientSocket.setSoTimeout(10000); // set time out if client doesn't respond in 10 seconds
+            clientSocket.setSoTimeout(20000); // set time out if client doesn't respond in 10 seconds
 
             while (true) {
                 // TODO: Implement communication protocol. Handle client requests, query CoinGecko API, and send responses

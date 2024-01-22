@@ -75,7 +75,7 @@ public class Server {
         Socket clientSocket;
         try {
             clientSocket = tcpServerSocket.accept();
-            System.out.println("A connection was established with a client on the address of " + clientSocket.getRemoteSocketAddress());
+            System.out.println("A TCP connection was established with a client on the address of " + clientSocket.getRemoteSocketAddress());
             TCPServerThread tcpServerThread = new TCPServerThread(clientSocket);
             tcpServerThread.start();
         } catch (IOException e) {
